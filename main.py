@@ -1,16 +1,59 @@
-# This is a sample Python script.
+# Imports
+from tkinter import *
+from tkinter.ttk import *
 
-# Press Mayús+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from time import strftime
+from googletrans import Translator
+
+import ctypes
+import locale
+
+# Variables declaration
+master = Tk()
+timeLabel = Label(
+    master,
+    font=("Helvetica", 25),
+    foreground="black"
+)
+dayLabel = Label(
+    master,
+    font=("Helvetica", 10),
+    foreground="black"
+)
+
+translator = Translator()
+
+# Region identifier for the language translation
+windll = ctypes.windll.kernel32
+regionLanguage = locale.windows_locale[windll.GetUserDefaultUILanguage()]
+
+# Configuration
+master.title("Clock Application")
+master.resizable(width=False, height=False)  # It can't be resized
+master.geometry("300x65")
+master.iconphoto(False, PhotoImage(file="./resources/clockimage.png"))
+
+dayLabel.pack(anchor="center")
+timeLabel.pack(anchor="center")
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+# Functions
+def time():
+    currentTime = strftime("%X %p").lower()
+
+    # Translation available
+    stringVanilla = strftime("%A, %d of %B").lower()
+    result = translator.translate(stringVanilla, src="en", dest=regionLanguage)
+    currentDay = result.text
+
+    timeLabel.config(text=currentTime)
+    dayLabel.config(text=currentDay)
+
+    # The function gets invoked every second (or 1000 milliseconds) and updates the text again
+    timeLabel.after(100, time)
+    dayLabel.after(86400000, time)  # Milliseconds required for a day
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+# Initializer
+time()
+mainloop()
